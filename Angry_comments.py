@@ -1,6 +1,6 @@
-#разработать бинарный классификатор
-#максимизировать RECALL
-#PRECISION > 0.95
+#TODO разработать бинарный классификатор
+#TODO максимизировать RECALL
+#TODO PRECISION > 0.95
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -17,8 +17,19 @@ from matplotlib import pyplot as plt
 from sklearn.metrics import plot_precision_recall_curve
 import numpy as np
 from sklearn.model_selection import GridSearchCV
+nltk.download('punkt')
 
-base = nltk.download('punkt')
-print(base)
-print(1)
+data_list = pd.read_csv('./data/labeled.csv', sep=',')
 
+data_list['toxic'] = data_list['toxic'].apply(int)
+#.apply - к каждой строчке применяем одну и ту же функцию(приведение float к int)
+
+# print(data_list.shape)
+# print(data_list.head(5))
+# print(data_list['toxic'].value_counts())
+# print(*(i for i in data_list[data_list['toxic'] == 1]['comment'].head(6)))
+# print(*(i for i in data_list[data_list['toxic'] == 0]['comment'].head(5)))
+train_data_list, test_data_list = train_test_split(data_list, test_size=500)
+# print(test_data_list.shape)
+print(test_data_list['toxic'].value_counts())
+print(train_data_list['toxic'].value_counts())
