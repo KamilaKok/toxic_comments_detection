@@ -46,32 +46,6 @@ features = vectorizer.fit_transform(train_data_list['comment'])
 model = LogisticRegression(random_state=0)
 model.fit(features, train_data_list['toxic'])
 
-# model_pipline = Pipeline([
-#     ('vectorizer', TfidfVectorizer(tokenizer=lambda x: tokenize_sentence(x, remove_stop_words=True))),
-#     ('model', LogisticRegression(random_state=0))
-# ]
-# )
-#
-# model_pipline.fit(train_data_list['comment'], train_data_list['toxic'])
-# print(model_pipline.fit(train_data_list['comment'], train_data_list['toxic']))
-
-
-# prec, rec, thresholds = precision_recall_curve(y_true=test_data_list['toxic'],
-#                                                probas_pred=model_pipline.predict_proba(test_data_list['comment'])[:, 1])
-#
-# disp = PrecisionRecallDisplay.from_estimator(estimator=model_pipline, X=test_data_list['comment'],
-#                                              y=test_data_list['toxic'])
-# disp.plot()
-# plt.show()
-# array_np = np.where(prec > 0.95)
-#
-# print(array_np)
-# print(precision_score(y_true=test_data_list['toxic'],
-#                       y_pred=model_pipline.predict_proba(test_data_list['comment'])[:, 1] > thresholds[444]))
-# print(recall_score(y_true=test_data_list['toxic'],
-#                    y_pred=model_pipline.predict_proba(test_data_list['comment'])[:, 1] > thresholds[444]))
-
-
 model_pipline_c_10 = Pipeline([
     ('vectorizer', TfidfVectorizer(tokenizer=lambda x: tokenize_sentence(x, remove_stop_words=True))),
     ('model', LogisticRegression(random_state=0, C=10))
