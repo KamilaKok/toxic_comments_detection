@@ -12,11 +12,14 @@ from nltk.stem import SnowballStemmer
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LogisticRegression
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import PrecisionRecallDisplay
 from sklearn.metrics import precision_score, recall_score, precision_recall_curve
 from matplotlib import pyplot as plt
 from sklearn.metrics import plot_precision_recall_curve
 import numpy as np
 from sklearn.model_selection import GridSearchCV
+import matplotlib.pyplot as plt
 
 nltk.download('punkt')
 nltk.download('stopwords')
@@ -44,13 +47,18 @@ russian_stop_words = stopwords.words('russian')
 
 
 def tokenize_sentence(sentence: str, remove_stop_words: bool = True):
-    tokens = word_tokenize(sentence_example, language='russian')  # разбиваем на токены
+    tokens = word_tokenize(sentence, language='russian')  # разбиваем на токены
     tokens = [i for i in tokens if i not in string.punctuation]  # удаляем знаки пунктуации
     if remove_stop_words:
         tokens = [i for i in tokens if i not in russian_stop_words]  # удаляем стоп-слова
     tokens = [snowball.stem(i) for i in tokens]  # приводим к нижнему регистру и удаляем окончания
     return tokens
 
+
+vectorizer = TfidfVectorizer(tokenizer=lambda x: tokenize_sentence(x, remove_stop_words=True))
+features = vectorizer.fit_transform(train_data_list['comment'])
+model = LogisticRegression(random_state=0)
+model.fit(features, train_data_list['toxic'])
 
 model_pipline = Pipeline([
     ('vectorizer', TfidfVectorizer(tokenizer=lambda x: tokenize_sentence(x, remove_stop_words=True))),
@@ -60,10 +68,20 @@ model_pipline = Pipeline([
 
 model_pipline.fit(train_data_list['comment'], train_data_list['toxic'])
 # print(model_pipline.fit(train_data_list['comment'], train_data_list['toxic']))
-# text = 1
-# while text != 0:
+
+# text = ""
+# while text != '0':
 #     text = input('Введите комментарий: ')
-# print(model_pipline.predict(['хуйло']))
-#
-# print(precision_score(y_true=test_data_list['toxic'], y_pred=model_pipline.predict(test_data_list['comment'])))
-# print(recall_score(y_true=test_data_list['toxic'], y_pred=model_pipline.predict(test_data_list['comment'])))
+#     check = model_pipline.predict([text])
+#     if 1 in check:
+#         print('Это токсичный комментарий')
+#     else:
+#         print('Это нейтральный комментарий')
+
+print(precision_score(y_true=test_data_list['toxic'], y_pred=model_pipline.predict(test_data_list['comment'])))
+print(recall_score(y_true=test_data_list['toxic'], y_pred=model_pipline.predict(test_data_list['comment'])))
+prec, rec, thresholds = precision_recall_curve(y_true=test_data_list['toxic'],
+                                               probas_pred=model_pipline.predict_proba(test_data_list['comment'])[:, 1])
+disp = PrecisionRecallDisplay.from_estimator(estimator=model_pipline, X=test_data_list['comment'], y=test_data_list['toxic'])
+disp.plot()
+plt.show()
